@@ -1,17 +1,12 @@
 package utils
 
 import (
-	"os"
+	"github.com/astaxie/beego/logs"
 )
 
-// create dir
-func CreateDirIfNotExist(dir string) error {
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
-			err = os.MkdirAll(dir, 0755)
-			if err != nil {
-					return err
-			}
-			return nil
-	}
-	return nil
+var FileLogs *logs.BeeLogger
+
+func init() {
+	FileLogs = logs.NewLogger(1000)
+	FileLogs.SetLogger("file", `{"filename":"logs/xalarm.log"}`)
 }

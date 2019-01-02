@@ -14,13 +14,19 @@ import (
 )
 
 func init() {
-	// ns := beego.NewNamespace("/api",
-	// 	beego.NSNamespace("/ce",
-	// 		beego.NSInclude(
-	// 			&controllers.ImController{},
-	// 		),
-	// 	),
-	// )
-	// beego.AddNamespace(ns)
-	beego.Router("/admin", &controllers.ImController{})
+	beego.Router("/api/tags/list", &controllers.ImtagController{}, "*:ListTag")
+	beego.Router("/api/tags/create", &controllers.ImtagController{}, "post:CreateTag")
+	beego.Router("/api/tags/update", &controllers.ImtagController{}, "post:UpdateTag")
+	beego.Router("/api/tags/delete", &controllers.ImtagController{}, "get:DeleteTag")
+	
+	beego.Router("/api/users/list", &controllers.ImUserController{},"*:ListAllUser")
+	beego.Router("/api/users/create", &controllers.ImUserController{},"*:CreateUser")
+	beego.Router("/api/users/delete", &controllers.ImUserController{},"*:DeleteUser")
+
+	beego.Router("/api/tag/users/list", &controllers.ImtagController{}, "*:ListTagMember")
+	beego.Router("/api/tag/users/create", &controllers.ImtagController{}, "post:CreateTagMember")
+	beego.Router("/api/tag/users/delete", &controllers.ImtagController{}, "post:DeleteTagMember") 
+
+	beego.Router("/send", &controllers.MsgController{})
 }
+

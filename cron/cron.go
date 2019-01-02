@@ -1,19 +1,16 @@
 package cron
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/httplib"
-	"io/ioutil"
 	"time"
 	"xalarm/g"
 )
 
 type TokenResponse struct {
-	Errcode     int    `json:"errcode"`
-	Errmsg      string `json:"errmsg"`
+	g.CommonResult
 	AccessToken string `json:"access_token"`
 }
 
@@ -23,49 +20,48 @@ func SyncToken() {
 
 	duration := time.Duration(interval) * time.Second
 	for {
-		syncToken()
+		syncGlobalToken()
+		syncLocalToken()
 		time.Sleep(duration)
 	}
 }
 
-func syncToken() {
-	token, ok := getToken()
+func syncGlobalToken() {
+	secret := beego.AppConfig.String("corpsecret")
+	token, ok := getToken(secret)
 	if ok != nil {
 		fmt.Println(ok.Error())
 	}
-	g.TokenSet.Reinit(token)
+	g.GlobalTokenSet.Reinit(token)
 }
 
-func getToken() (string, error) {
+func syncLocalToken() {
+	secret := beego.AppConfig.String("addressbooksecret")
+	token, ok := getToken(secret)
+	if ok != nil {
+		fmt.Println(ok.Error())
+	}
+	g.LocalTokenSet.Reinit(token)
+}
+
+func getToken(secret string) (string, error) {
 
 	corpid := beego.AppConfig.String("corpid")
-	corpsecret := beego.AppConfig.String("corpsecret")
 
-	url := fmt.Sprintf("https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=%s&corpsecret=%s", corpid, corpsecret)
-
+	url := fmt.Sprintf("https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=%s&corpsecret=%s", corpid, secret)
 	req := httplib.Get(url)
-	result, ok := req.Response()
+	req.SetTimeout(1*time.Second, 3*time.Second)
+
+	var ret TokenResponse
+	ok := req.ToJSON(&ret)
 	if ok != nil {
 		return "", ok
 	}
 
-	code := result.StatusCode
-	if code != 200 {
-		return "", errors.New("get wechat token faild")
-	}
-
-	data, ok := ioutil.ReadAll(result.Body)
-	if ok != nil {
-		return "", ok
-	}
-
-	var msg TokenResponse
-	json.Unmarshal(data, &msg)
-
-	errCode := msg.Errcode
+	errCode := ret.Errcode
 	if errCode != 0 {
-		return "", errors.New(msg.Errmsg)
+		return "", errors.New(ret.Errmsg)
 	}
 
-	return msg.AccessToken, nil
+	return ret.AccessToken, nil
 }
