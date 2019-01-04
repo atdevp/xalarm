@@ -6,6 +6,7 @@ import (
 	"xalarm/models"
 )
 
+// TAG  API
 type ImtagController struct {
 	beego.Controller
 }
@@ -144,7 +145,7 @@ func (o *ImtagController) ListTagMember() {
 }
 
 //添加指定用户
-func(o *ImtagController) CreateTagMember() {
+func (o *ImtagController) CreateTagMember() {
 	var data models.ImTagUser
 	ok := json.Unmarshal(o.Ctx.Input.RequestBody, &data)
 	if ok != nil {
@@ -164,14 +165,14 @@ func(o *ImtagController) CreateTagMember() {
 		o.ServeJSON()
 	}
 	o.Data["json"] = map[string]interface{}{
-		"errcode":  0,
-		"errmsg":   "",
+		"errcode": 0,
+		"errmsg":  "",
 	}
 	o.ServeJSON()
 }
 
 //删除指定用户
-func(o *ImtagController) DeleteTagMember() {
+func (o *ImtagController) DeleteTagMember() {
 	var data models.ImTagUser
 	ok := json.Unmarshal(o.Ctx.Input.RequestBody, &data)
 	if ok != nil {
@@ -191,8 +192,8 @@ func(o *ImtagController) DeleteTagMember() {
 		o.ServeJSON()
 	}
 	o.Data["json"] = map[string]interface{}{
-		"errcode":  0,
-		"errmsg":   "",
+		"errcode": 0,
+		"errmsg":  "",
 	}
 	o.ServeJSON()
 }

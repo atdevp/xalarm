@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"strings"
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"xalarm/models"
@@ -41,7 +42,14 @@ func (o *ImUserController) CreateUser() {
 		o.ServeJSON()
 	}
 
-	ok := models.UserSet.Create(data.Userid, data.Name, data.Mobile)
+	emailList := strings.Split(data.Userid, "@")
+	
+	username := "unknown"
+	if len(emailList) > 0 {
+		username = emailList[0]
+	}
+ 	
+	ok := models.UserSet.Create(data.Userid, username, data.Mobile)
 	if ok != nil {
 		o.Data["json"] = map[string]interface{}{
 			"errcode": -1,

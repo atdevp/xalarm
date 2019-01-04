@@ -7,6 +7,7 @@ import (
 	"github.com/astaxie/beego/httplib"
 	"time"
 	"xalarm/g"
+	"xalarm/utils"
 )
 
 type TokenResponse struct {
@@ -16,10 +17,12 @@ type TokenResponse struct {
 
 func SyncToken() {
 
-	interval := beego.AppConfig.DefaultInt64("access_token_interval", 7000)
+	interval := beego.AppConfig.DefaultInt64("access_token_interval", 3600)
 
 	duration := time.Duration(interval) * time.Second
 	for {
+		currentTime := time.Now().Format("2006-01-02 15:04:05")
+		utils.FileLogs.Info("cron_sync_token_time: %v", currentTime)
 		syncGlobalToken()
 		syncLocalToken()
 		time.Sleep(duration)

@@ -3,6 +3,7 @@ package main
 import (
 	_ "xalarm/routers"
 	_ "xalarm/utils"
+	//_ "xalarm/docs"
 	"github.com/astaxie/beego"
 	"xalarm/cron"
 )
@@ -12,7 +13,7 @@ func startServer() {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
-	beego.SetStaticPath("/swagger", "swagger")
+	// beego.SetStaticPath("/swagger", "swagger")
 	beego.Run()
 }
 
