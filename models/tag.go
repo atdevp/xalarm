@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego/httplib"
 	"time"
 	"xalarm/g"
+	"xalarm/utils"
 )
 
 var (
@@ -56,25 +57,49 @@ func (t *ImTag) Getall() ([]ImTag, error) {
 	return ret.Taglist, nil
 }
 
-func (t *ImTag) Create(id int64, name string) error {
+func (t *ImTag) Create(name string) error {
 
 	token := g.GlobalTokenSet.Get()
 
-	url := fmt.Sprintf("https://qyapi.weixin.qq.com/cgi-bin/tag/create?access_token=%s", token)
-	req := httplib.Post(url)
-	req.JSONBody(map[string]interface{}{"tagid": id, "tagname": name})
+	var ret TagListResult
+	url := fmt.Sprintf("https://qyapi.weixin.qq.com/cgi-bin/tag/list?access_token=%s", token)
+	req := httplib.Get(url)
+	req.SetTimeout(1*time.Second, 3*time.Second)
+	ok := req.ToJSON(&ret)
+
+	var tagid int64 
+	if ok != nil {
+		tagid = 100
+	}
+
+	tagList := ret.Taglist
+	if len(tagList) == 0 { 
+		tagid = 1
+	}
+	tmp := []int64{}
+	for _, v := range tagList {
+		tmp = append(tmp, v.TagID)
+	}
+
+	biggest := utils.GetMaxNumber(tmp)
+	tagid = biggest + 1
+
+
+	url = fmt.Sprintf("https://qyapi.weixin.qq.com/cgi-bin/tag/create?access_token=%s", token)
+	req = httplib.Post(url)
+	req.JSONBody(map[string]interface{}{"tagid": tagid, "tagname": name})
 	req.SetTimeout(1*time.Second, 3*time.Second)
 
-	var ret g.CommonResult
-	ok := req.ToJSON(&ret)
+	var retc g.CommonResult
+	ok = req.ToJSON(&ret)
 
 	if ok != nil {
 		return ok
 	}
 
-	errCode := ret.Errcode
+	errCode := retc.Errcode
 	if errCode != 0 {
-		return errors.New(ret.Errmsg)
+		return errors.New(retc.Errmsg)
 	}
 
 	return nil

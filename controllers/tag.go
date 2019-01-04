@@ -43,7 +43,7 @@ func (o *ImtagController) CreateTag() {
 		o.ServeJSON()
 	}
 
-	ok = models.TagSet.Create(data.TagID, data.TagName)
+	ok = models.TagSet.Create(data.TagName)
 	if ok != nil {
 		o.Data["json"] = map[string]interface{}{
 			"errcode": -1,
@@ -62,8 +62,17 @@ func (o *ImtagController) CreateTag() {
 //修改tag
 func (o *ImtagController) UpdateTag() {
 
+	tagid, ok := o.GetInt64("tagid")
+	if ok != nil {
+		o.Data["json"] = map[string]interface{}{
+			"errcode": -1,
+			"errmsg":  "参数不合法",
+		}
+		o.ServeJSON()
+	}
+
 	var data models.ImTag
-	ok := json.Unmarshal(o.Ctx.Input.RequestBody, &data)
+	ok = json.Unmarshal(o.Ctx.Input.RequestBody, &data)
 
 	if ok != nil {
 		o.Data["json"] = map[string]interface{}{
@@ -73,7 +82,7 @@ func (o *ImtagController) UpdateTag() {
 		o.ServeJSON()
 	}
 
-	ok = models.TagSet.UpdateName(data.TagID, data.TagName)
+	ok = models.TagSet.UpdateName(tagid, data.TagName)
 	if ok != nil {
 		o.Data["json"] = map[string]interface{}{
 			"errcode": -1,
@@ -146,8 +155,8 @@ func (o *ImtagController) ListTagMember() {
 
 //添加指定用户
 func (o *ImtagController) CreateTagMember() {
-	var data models.ImTagUser
-	ok := json.Unmarshal(o.Ctx.Input.RequestBody, &data)
+
+	tagid, ok := o.GetInt64("tagid")
 	if ok != nil {
 		o.Data["json"] = map[string]interface{}{
 			"errcode": -1,
@@ -156,7 +165,17 @@ func (o *ImtagController) CreateTagMember() {
 		o.ServeJSON()
 	}
 
-	ok = models.TagSet.AddMember(data.TagID, data.UserList)
+	var data models.ImTagUser
+	ok = json.Unmarshal(o.Ctx.Input.RequestBody, &data)
+	if ok != nil {
+		o.Data["json"] = map[string]interface{}{
+			"errcode": -1,
+			"errmsg":  "参数不合法",
+		}
+		o.ServeJSON()
+	}
+
+	ok = models.TagSet.AddMember(tagid, data.UserList)
 	if ok != nil {
 		o.Data["json"] = map[string]interface{}{
 			"errcode": -1,
@@ -173,8 +192,7 @@ func (o *ImtagController) CreateTagMember() {
 
 //删除指定用户
 func (o *ImtagController) DeleteTagMember() {
-	var data models.ImTagUser
-	ok := json.Unmarshal(o.Ctx.Input.RequestBody, &data)
+	tagid, ok := o.GetInt64("tagid")
 	if ok != nil {
 		o.Data["json"] = map[string]interface{}{
 			"errcode": -1,
@@ -183,7 +201,17 @@ func (o *ImtagController) DeleteTagMember() {
 		o.ServeJSON()
 	}
 
-	ok = models.TagSet.DeleteMember(data.TagID, data.UserList)
+	var data models.ImTagUser
+	ok = json.Unmarshal(o.Ctx.Input.RequestBody, &data)
+	if ok != nil {
+		o.Data["json"] = map[string]interface{}{
+			"errcode": -1,
+			"errmsg":  "参数不合法",
+		}
+		o.ServeJSON()
+	}
+
+	ok = models.TagSet.DeleteMember(tagid, data.UserList)
 	if ok != nil {
 		o.Data["json"] = map[string]interface{}{
 			"errcode": -1,
