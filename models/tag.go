@@ -18,15 +18,15 @@ type ImTag struct {
 	TagName string `json:"tagname"`
 }
 
-type ImTagUser struct{
+type ImTagUser struct {
 	ImTag
 	UserList []string `json:"userlist"`
 }
 
 type MemberForTagResult struct {
 	g.CommonResult
-	Tagname  string     `json:"tagname"`
-	UserList []g.ImUser `json:"userlist"`
+	Tagname  string              `json:"tagname"`
+	UserList []map[string]string `json:"userlist"`
 }
 
 type TagListResult struct {
@@ -67,13 +67,13 @@ func (t *ImTag) Create(name string) error {
 	req.SetTimeout(1*time.Second, 3*time.Second)
 	ok := req.ToJSON(&ret)
 
-	var tagid int64 
+	var tagid int64
 	if ok != nil {
 		tagid = 100
 	}
 
 	tagList := ret.Taglist
-	if len(tagList) == 0 { 
+	if len(tagList) == 0 {
 		tagid = 1
 	}
 	tmp := []int64{}
@@ -83,7 +83,6 @@ func (t *ImTag) Create(name string) error {
 
 	biggest := utils.GetMaxNumber(tmp)
 	tagid = biggest + 1
-
 
 	url = fmt.Sprintf("https://qyapi.weixin.qq.com/cgi-bin/tag/create?access_token=%s", token)
 	req = httplib.Post(url)
@@ -152,8 +151,8 @@ func (t *ImTag) Delete(id int64) error {
 	return nil
 }
 
-func (t *ImTag) GetMember(id int64) ([]g.ImUser, error) {
-	token := g.GlobalTokenSet.Get()
+func (t *ImTag) GetMember(id int64) ([]map[string]string, error) {
+	token := g.LocalTokenSet.Get()
 
 	url := fmt.Sprintf("https://qyapi.weixin.qq.com/cgi-bin/tag/get?access_token=%s&tagid=%d", token, id)
 	req := httplib.Get(url)
@@ -161,14 +160,15 @@ func (t *ImTag) GetMember(id int64) ([]g.ImUser, error) {
 
 	var ret MemberForTagResult
 	ok := req.ToJSON(&ret)
+	fmt.Println(ret.UserList)
 
 	if ok != nil {
-		return []g.ImUser{}, ok
+		return []map[string]string{}, ok
 	}
 
 	errCode := ret.Errcode
 	if errCode != 0 {
-		return []g.ImUser{}, errors.New(ret.Errmsg)
+		return []map[string]string{}, errors.New(ret.Errmsg)
 	}
 
 	return ret.UserList, nil
@@ -177,7 +177,9 @@ func (t *ImTag) GetMember(id int64) ([]g.ImUser, error) {
 func (t *ImTag) AddMember(id int64, userlist []string) error {
 	token := g.GlobalTokenSet.Get()
 
+	fmt.Println(id, userlist)
 	url := fmt.Sprintf("https://qyapi.weixin.qq.com/cgi-bin/tag/addtagusers?access_token=%s", token)
+
 	req := httplib.Post(url)
 	req.JSONBody(map[string]interface{}{"tagid": id, "userlist": userlist})
 	req.SetTimeout(1*time.Second, 3*time.Second)
