@@ -24,7 +24,7 @@ func init() {
 	beego.Router("/api/tag/users/create", &controllers.ImtagController{}, "post:CreateTagMember")
 	beego.Router("/api/tag/users/delete", &controllers.ImtagController{}, "post:DeleteTagMember")
 
-	beego.Router("/api/mrdmsg/send", &controllers.MsgController{})
+	beego.Router("/api/alarm/wechat/send", &controllers.MsgController{})
 }
 
 
