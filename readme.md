@@ -104,7 +104,7 @@ curl -XPOST 'http://127.0.0.1:8000/api/msg/send' -d '
 ```
  - 按用户发送
 ``` 
-curl -XPOST 'http://127.0.0.1:8000/api/msg/send' -d '
+curl -XPOST 'http://127.0.0.1:8000/api/alarm/wechat/send' -d '
 {
     "touser":"1075741124@qq.com|1075741124@qq.com",
     "totag":"",
