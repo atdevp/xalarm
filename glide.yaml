@@ -1,0 +1,12 @@
+package: xalarm
+import:
+- package: github.com/astaxie/beego
+  version: ^1.11.1
+  subpackages:
+  - httplib
+  - logs
+testImport:
+- package: github.com/smartystreets/goconvey
+  version: ^1.6.3
+  subpackages:
+  - convey
