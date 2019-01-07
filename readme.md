@@ -94,7 +94,7 @@ curl -XPOST 'http://127.0.0.1:8000/api/tag/users/delete?tagid=1' -d '
 ### 发送信息
  - 按组发送
 ``` 
-curl -XPOST 'http://127.0.0.1:8000/api/msg/send' -d '
+curl -XPOST 'http://127.0.0.1:8000/api/alarm/wechat/send' -d '
 {
     "touser":"",
     "totag":"1|2",
@@ -114,7 +114,7 @@ curl -XPOST 'http://127.0.0.1:8000/api/alarm/wechat/send' -d '
 ```
  - 按组&用户发送
 ``` 
-curl -XPOST 'http://127.0.0.1:8000/api/msg/send' -d '
+curl -XPOST 'http://127.0.0.1:8000/api/alarm/wechat/send' -d '
 {
     "touser":"1075741124@qq.com",
     "totag":"1|2",
